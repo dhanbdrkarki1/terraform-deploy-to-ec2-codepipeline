@@ -1,9 +1,9 @@
 output "instance_id" {
-  value = try(aws_instance.bastion[*].id, [])
+  value = try(aws_instance.this[*].id, [])
 }
 
 output "instance_ip" {
-  value = try(aws_instance.bastion[*].public_ip, [])
+  value = try(aws_instance.this[*].public_ip, [])
 }
 
 

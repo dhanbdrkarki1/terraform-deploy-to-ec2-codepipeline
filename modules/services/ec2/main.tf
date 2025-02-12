@@ -12,7 +12,7 @@ locals {
 }
 
 
-resource "aws_instance" "bastion" {
+resource "aws_instance" "this" {
   count                       = var.create ? length(var.availability_zones) : 0
   ami                         = local.final_ami_id
   instance_type               = var.instance_type

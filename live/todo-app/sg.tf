@@ -3,13 +3,13 @@ locals {
 }
 
 #================================
-# Bastion Security Groups
+# Server Security Groups
 #================================
 module "bastion_sg" {
   source      = "../../modules/services/sg"
   create      = true
-  name        = "bastion-sg"
-  description = "Security group for Bastion Host"
+  name        = "server-sg"
+  description = "Security group for EC2 Server"
   vpc_id      = data.aws_vpc.default.id # Use the default VPC
   # ingress_cidr_blocks = [local.my_public_ip]
   ingress_cidr_blocks = ["0.0.0.0/0"]
