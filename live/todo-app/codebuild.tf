@@ -1,5 +1,60 @@
 #================================
-# CodeBuild Service Role
+# CodeBuild S3
+#================================
+module "codebuild_artifact_bucket" {
+  source               = "../../modules/services/s3"
+  create               = true
+  bucket_name          = "codebuild-logs"
+  enable_versioning    = true
+  force_destroy        = true
+  create_bucket_policy = true
+  bucket_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "codebuild.amazonaws.com"
+        },
+        "Action" : [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:GetObjectVersion",
+          "s3:ListBucket",
+          "s3:GetBucketAcl",
+          "s3:GetBucketLocation"
+        ],
+        "Resource" : [
+          "${module.codebuild_artifact_bucket.bucket_arn}",
+          "${module.codebuild_artifact_bucket.bucket_arn}/*"
+        ]
+      }
+    ]
+  })
+
+  custom_tags = {
+    Project     = var.project_name
+    Environment = var.environment
+  }
+}
+
+#================================
+# CodeBuild Log Group
+#================================
+module "codebuild_log_group" {
+  source            = "../../modules/services/cloudwatch"
+  create            = true
+  name              = "/aws/codebuild/${var.project_name}-${var.environment}"
+  retention_in_days = 30
+
+  custom_tags = {
+    Name        = "/aws/codebuild/${var.project_name}-${var.environment}"
+    Environment = var.environment
+  }
+}
+
+#================================
+# CodeBuild Service Role and Policy
 #================================
 module "codebuild_service_role" {
   source           = "../../modules/services/iam"
@@ -49,7 +104,7 @@ module "codebuild_service_role" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Resource = "*"
+        Resource = try(module.codebuild_log_group.log_group_arn, "*")
       },
       # CodeBuild permissions
       {
@@ -61,7 +116,7 @@ module "codebuild_service_role" {
           "codebuild:BatchPutTestCases",
           "codebuild:BatchPutCodeCoverages"
         ]
-        Resource = "*" # All resources
+        Resource = try(module.codebuild.arn, "*")
       },
       # CodeStart and CodeConnection Permssions
       {
@@ -87,7 +142,7 @@ module "codebuild_service_role" {
           "ecr:UploadLayerPart",
           "ecr:CompleteLayerUpload"
         ]
-        Resource = "*"
+        Resource = try(module.ecr.arn, "*")
       }
     ]
   })
@@ -95,55 +150,6 @@ module "codebuild_service_role" {
   custom_tags = {
     Environment = var.environment
     Project     = var.project_name
-  }
-}
-
-module "codebuild_artifact_bucket" {
-  source               = "../../modules/services/s3"
-  create               = true
-  bucket_name          = "codebuild-logs"
-  enable_versioning    = true
-  force_destroy        = true
-  create_bucket_policy = true
-  bucket_policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Effect" : "Allow",
-        "Principal" : {
-          "Service" : "codebuild.amazonaws.com"
-        },
-        "Action" : [
-          "s3:PutObject",
-          "s3:GetObject",
-          "s3:GetObjectVersion",
-          "s3:ListBucket",
-          "s3:GetBucketAcl",
-          "s3:GetBucketLocation"
-        ],
-        "Resource" : [
-          "${module.codebuild_artifact_bucket.bucket_arn}",
-          "${module.codebuild_artifact_bucket.bucket_arn}/*"
-        ]
-      }
-    ]
-  })
-
-  custom_tags = {
-    Project     = var.project_name
-    Environment = var.environment
-  }
-}
-
-module "codebuild_log_group" {
-  source            = "../../modules/services/cloudwatch"
-  create            = true
-  name              = "/aws/codebuild/${var.project_name}-${var.environment}"
-  retention_in_days = 30
-
-  custom_tags = {
-    Name        = "/aws/codebuild/${var.project_name}-${var.environment}"
-    Environment = var.environment
   }
 }
 

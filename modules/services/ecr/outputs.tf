@@ -9,3 +9,7 @@ output "repository_name" {
 output "repository_url" {
   value = try(aws_ecr_repository.ecr[0].repository_url, null)
 }
+
+output "arn" {
+  value = try(aws_ecr_repository.ecr[0].arn, null)
+}
