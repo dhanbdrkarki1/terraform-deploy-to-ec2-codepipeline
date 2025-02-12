@@ -104,7 +104,10 @@ module "codebuild_service_role" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Resource = try(module.codebuild_log_group.log_group_arn, "*")
+        Resource = [
+          "${try(module.codebuild_log_group.log_group_arn, "*")}",
+          "${try(module.codebuild_log_group.log_group_arn, "*")}:*"
+        ]
       },
       # CodeBuild permissions
       {
@@ -118,24 +121,27 @@ module "codebuild_service_role" {
         ]
         Resource = try(module.codebuild.arn, "*")
       },
-      # CodeStart and CodeConnection Permssions
+      # CodeConnection Permssions
       {
         Effect = "Allow"
         Action = [
-          "codestar-connections:GetConnectionToken",
-          "codestar-connections:GetConnection",
           "codeconnections:GetConnectionToken",
           "codeconnections:GetConnection",
           "codeconnections:UseConnection"
         ]
-        # updte codestart connection arn and codeconnection arn
-        Resource = "*"
+        Resource = try(var.codeconnection_arn, "*")
       },
       # ECR Permissions
       {
         Effect = "Allow"
         Action = [
-          "ecr:GetAuthorizationToken",
+          "ecr:GetAuthorizationToken"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
           "ecr:BatchCheckLayerAvailability",
           "ecr:PutImage",
           "ecr:InitiateLayerUpload",

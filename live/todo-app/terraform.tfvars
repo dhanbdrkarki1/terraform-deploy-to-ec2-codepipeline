@@ -35,7 +35,7 @@ codebuild_privileged_mode             = false
 #================================
 # CodePipeline
 #================================
-create_codepipeline    = true
-github_repo_id         = "dhan-cloudtech/todo-with-auth"
-github_repo_branch     = "main"
-codestarconnection_arn = "arn:aws:codeconnections:us-east-2:664418970145:connection/717bcd81-1735-42a5-a28e-05cf28d02c7c"
+create_codepipeline = true
+github_repo_id      = "dhan-cloudtech/todo-with-auth"
+github_repo_branch  = "main"
+codeconnection_arn  = "arn:aws:codeconnections:us-east-2:664418970145:connection/717bcd81-1735-42a5-a28e-05cf28d02c7c"

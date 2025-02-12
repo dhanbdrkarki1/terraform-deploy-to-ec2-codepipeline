@@ -311,7 +311,7 @@ module "codepipeline" {
         provider = "CodeStarSourceConnection"
         version  = "1"
         configuration = {
-          ConnectionArn    = var.codestarconnection_arn
+          ConnectionArn    = var.codeconnection_arn
           FullRepositoryId = var.github_repo_id
           BranchName       = var.github_repo_branch
         }
