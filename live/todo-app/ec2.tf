@@ -2,10 +2,11 @@
 # Instance Profile
 #================================
 module "instance_profile" {
-  source           = "../../modules/services/iam"
-  create           = true
-  role_name        = "EC2CodeDeployRole"
-  role_description = "IAM Instance role for EC2"
+  source                      = "../../modules/services/iam"
+  create                      = true
+  create_ec2_instance_profile = true
+  role_name                   = "EC2CodeDeployRole"
+  role_description            = "IAM Instance role for EC2"
 
   # Trust relationship policy for EC2
   assume_role_policy = jsonencode({

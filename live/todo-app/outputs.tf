@@ -1,4 +1,4 @@
 # Outputs
-output "ecr_repository_url" {
-  value = module.ecr.repository_url
+output "server_ip" {
+  value = module.app_server.instance_ip
 }
